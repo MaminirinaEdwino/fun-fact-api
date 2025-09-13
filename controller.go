@@ -54,13 +54,15 @@ func GetAll(w http.ResponseWriter, r *http.Request){
 }
 
 func GetById(w http.ResponseWriter, r *http.Request){
-	fmt.Println("teste de sqlite avec golang")
+	// id := r.URL.Query().Get("id")
+	fmt.Println("teste de sqlite avec golang by id")
 	db, err := sql.Open("sqlite3", "db.sqlite")
 	if err != nil {
 		fmt.Println("Erreur pendant l'ouverture de la base de donnée")
 		return
 	}
 	defer db.Close()
+	fmt.Fprintf(w, "id: %s", r.PathValue("id"))
 
 }
 
