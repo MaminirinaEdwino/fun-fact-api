@@ -16,6 +16,8 @@ func MainController(w http.ResponseWriter, r *http.Request){
 	fmt.Fprintln(w, ReadTemplate("Template/mainController.html"))
 }
 
+
+
 func CreateTable(w http.ResponseWriter, r *http.Request) {
 	database.ConnectDB()
 	_, err := database.DB.Exec("CREATE TABLE IF NOT EXISTS funfactlist (id INTEGER PRIMARY KEY AUTOINCREMENT, funfact TEXT)")
