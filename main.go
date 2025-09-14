@@ -16,7 +16,7 @@ func main() {
 		AllowedOrigins: []string{"*"},
 		AllowCredentials: true,
 		AllowedHeaders: []string{"*"},
-		AllowedMethods: []string{"*"},
+		AllowedMethods: []string{"GET", "POST", "DELETE", "PUT"},
 	})
 	routes.Router(mux)
 	fmt.Println("Server started on localhost:8000")
