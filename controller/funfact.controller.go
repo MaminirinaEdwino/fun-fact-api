@@ -1,19 +1,17 @@
 package controller
 
 import (
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/MaminirinaEdwino/fun-fact-api/database"
 	"github.com/MaminirinaEdwino/fun-fact-api/model"
 	_ "github.com/mattn/go-sqlite3"
 )
 
-
-
-func CreateTable(w http.ResponseWriter, r *http.Request){
+func CreateTable(w http.ResponseWriter, r *http.Request) {
 	database.ConnectDB()
 	_, err := database.DB.Exec("CREATE TABLE IF NOT EXISTS funfactlist (id INTEGER PRIMARY KEY AUTOINCREMENT, funfact TEXT)")
 	if err != nil {
@@ -22,7 +20,7 @@ func CreateTable(w http.ResponseWriter, r *http.Request){
 	database.CloseDB()
 }
 
-func GetAll(w http.ResponseWriter, r *http.Request){
+func GetAll(w http.ResponseWriter, r *http.Request) {
 	var FfList model.FunFactList
 	database.ConnectDB()
 	rows, err := database.DB.Query("SELECT * FROM funfactlist")
@@ -36,7 +34,7 @@ func GetAll(w http.ResponseWriter, r *http.Request){
 	for rows.Next() {
 		var funfact model.Funfact
 		err = rows.Scan(&funfact.Id, &funfact.FunFact)
-		
+
 		if err != nil {
 			fmt.Println("Erreur lors du scan", err)
 			continue
@@ -52,38 +50,38 @@ func GetAll(w http.ResponseWriter, r *http.Request){
 	}
 }
 
-func GetById(w http.ResponseWriter, r *http.Request){
-	// id := r.URL.Query().Get("id")
-	// fmt.Println("teste de sqlite avec golang by id")
+func GetById(w http.ResponseWriter, r *http.Request) {
+
 	var funfact model.Funfact
 	id := r.PathValue("id")
 	database.ConnectDB()
 	result, err := database.DB.Query("SELECT * FROM funfactlist where id = ? ", id)
-	if err!= nil {
+	if err != nil {
 		fmt.Println("Erreur lors de la recuperation des données")
 	}
-	
+
 	result.Next()
-	result.Scan(&funfact.Id, &funfact.FunFact)
+	defer result.Close()
+	err = result.Scan(&funfact.Id, &funfact.FunFact)
+	
+	if err != nil{
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusNotFound)
+		err = json.NewEncoder(w).Encode(model.BasicResponse{
+			Action: "get funfact by id",
+			Message: "funfact not found",
+		})
+		return
+	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	err = json.NewEncoder(w).Encode(funfact)
 
-
 }
 
-func Post(w http.ResponseWriter, r *http.Request){
+func Post(w http.ResponseWriter, r *http.Request) {
 	database.ConnectDB()
-	// var ff model.FunFactPost
-	// _, err := database.DB.Exec("INSERT INTO funfactlist (funfact) VALUES (?)", "rose are red")
-	// if err != nil {
-	// 	fmt.Printf("Erreur lord de l'insertion %s\n", err)
-	// 	return
-	// }
-	// body, err := io.ReadAll(r.Body)
-	// if err!= nil {
-	// 	fmt.Println("Bpody error")
-	// }
+
 	var ff model.FunFactPost
 
 	decodeur := json.NewDecoder(r.Body)
@@ -98,27 +96,56 @@ func Post(w http.ResponseWriter, r *http.Request){
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(ff)
-	
-}
-
-func Put(w http.ResponseWriter, r *http.Request){
-	fmt.Println("teste de sqlite avec golang")
-	db, err := sql.Open("sqlite3", "db.sqlite")
-	if err != nil {
-		fmt.Println("Erreur pendant l'ouverture de la base de donnée")
-		return
-	}
-	defer db.Close()
 
 }
 
-func Delete(w http.ResponseWriter, r *http.Request){
-	fmt.Println("teste de sqlite avec golang")
-	db, err := sql.Open("sqlite3", "db.sqlite")
+func Put(w http.ResponseWriter, r *http.Request) {
+	database.ConnectDB()
+	defer database.DB.Close()
+	id := r.PathValue("id")
+	var ff model.FunFactPost
+
+	decoder := json.NewDecoder(r.Body)
+	err := decoder.Decode(&ff)
 	if err != nil {
-		fmt.Println("Erreur pendant l'ouverture de la base de donnée")
+		fmt.Println("Erreur lors du decodage du contenu de la requette", err)
+	}
+
+	_, err = database.DB.Exec("UPDATE funfactlist SET funfact = ? WHERE id = ?", ff.Funfact, id)
+	if err != nil {
+		fmt.Println("Erreur lors de la modification", err)
 		return
 	}
-	defer db.Close()
+	database.CloseDB()
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+
+	nbr, err := strconv.Atoi(id)
+
+	response := model.Funfact{
+		Id:      nbr,
+		FunFact: ff.Funfact,
+	}
+	json.NewEncoder(w).Encode(response)
+
+}
+
+func Delete(w http.ResponseWriter, r *http.Request) {
+	database.ConnectDB()
+	defer database.CloseDB()
+	_, err := database.DB.Exec("DELETE FROM funfactlist WHERE id = ?", r.PathValue("id"))
+
+	if err != nil {
+		fmt.Println("erreur de suppression", err)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	response := model.BasicResponse{
+		Action:  "Delete funfact",
+		Message: "Funfact deleted",
+	}
+	json.NewEncoder(w).Encode(response)
 
 }

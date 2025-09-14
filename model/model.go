@@ -10,3 +10,8 @@ type FunFactPost struct {
 }
 
 type FunFactList []Funfact
+
+type BasicResponse struct {
+	Action string
+	Message string
+}
