@@ -14,8 +14,6 @@ func main() {
 	mux := http.NewServeMux()
 	cors := cors.New(cors.Options{
 		AllowedOrigins: []string{"*"},
-		AllowedMethods: []string{"*"},
-		AllowedHeaders: []string{"*"},
 		AllowCredentials: true,
 	})
 	routes.Router(mux)
