@@ -7,9 +7,11 @@ import (
 )
 
 func Router(mux *http.ServeMux){
-	mux.HandleFunc("POST /", controller.Post)
-	mux.HandleFunc("GET /", controller.GetAll)
-	mux.HandleFunc("GET /{id}", controller.GetById)
-	mux.HandleFunc("PUT /{id}", controller.Put)
-	mux.HandleFunc("DELETE /{id}", controller.Delete)
+	// mux.Handle("GET /", http.FileServer(http.Dir("./Template")))
+	mux.HandleFunc("GET /", controller.MainController)
+	mux.HandleFunc("POST /funfact", controller.Post)
+	mux.HandleFunc("GET /funfact", controller.GetAll)
+	mux.HandleFunc("GET /funfact/{id}", controller.GetById)
+	mux.HandleFunc("PUT /funfact/{id}", controller.Put)
+	mux.HandleFunc("DELETE /funfact/{id}", controller.Delete)
 }

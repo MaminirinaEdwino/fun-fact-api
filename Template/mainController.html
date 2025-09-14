@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Funfact</title>
+</head>
+<body>
+    <header>
+        <p>
+            FunFact
+        </p>
+    </header>
+    <div id="funfactlist">
+
+    </div>
+    <nav>
+        <h3>
+            add funfact
+        </h3>
+        <div>
+            <label for="inputFunfact">FunFact</label>
+            <textarea type="text" id="inputFunfact"></textarea>
+                <button type="submit" onclick="add()">Add</button>
+        </div>
+    </nav>
+    <script>
+        fetch("/funfact")
+        .then(res=>res.json())
+        .then(res=>{
+            document.getElementById('funfactlist').innerHTML = ""
+            console.log(res)
+            for (i =0; i<res.length ; i++){
+                document.getElementById('funfactlist').innerHTML+=`
+                    <p>
+                        ${res[i].FunFact}
+                    </p>
+                `
+            }
+        })
+        function add(){
+            let funfact = document.getElementById("inputFunfact").value
+
+            fetch('/funfact', {
+                method:"POST",
+                headers: {
+                    "Content-type": "aplication/json"
+                }
+            }).then(res=>res.json())
+            .then(res=>console.log('funfact added'))
+            .catch(err=>console.error(err))
+        }
+    </script>
+
+</body>
+</html>

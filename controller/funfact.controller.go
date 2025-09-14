@@ -11,6 +11,11 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
+func MainController(w http.ResponseWriter, r *http.Request){
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	fmt.Fprintln(w, ReadTemplate("Template/mainController.html"))
+}
+
 func CreateTable(w http.ResponseWriter, r *http.Request) {
 	database.ConnectDB()
 	_, err := database.DB.Exec("CREATE TABLE IF NOT EXISTS funfactlist (id INTEGER PRIMARY KEY AUTOINCREMENT, funfact TEXT)")
