@@ -45,7 +45,9 @@
                 method:"POST",
                 headers: {
                     "Content-type": "aplication/json"
-                }
+                },
+                body: JSON.stringify({
+                funfact: funfact})
             }).then(res=>res.json())
             .then(res=>console.log('funfact added'))
             .catch(err=>console.error(err))
