@@ -23,6 +23,10 @@ func CreateTable(w http.ResponseWriter, r *http.Request) {
 func GetAll(w http.ResponseWriter, r *http.Request) {
 	var FfList model.FunFactList
 	database.ConnectDB()
+	_, err := database.DB.Exec("CREATE TABLE IF NOT EXISTS funfactlist (id INTEGER PRIMARY KEY AUTOINCREMENT, funfact TEXT)")
+	if err != nil {
+		fmt.Printf("Erreur lors de la creation de la table %s\n", err)
+	}
 	rows, err := database.DB.Query("SELECT * FROM funfactlist")
 
 	if err != nil {
@@ -55,6 +59,12 @@ func GetById(w http.ResponseWriter, r *http.Request) {
 	var funfact model.Funfact
 	id := r.PathValue("id")
 	database.ConnectDB()
+
+	_, err := database.DB.Exec("CREATE TABLE IF NOT EXISTS funfactlist (id INTEGER PRIMARY KEY AUTOINCREMENT, funfact TEXT)")
+	if err != nil {
+		fmt.Printf("Erreur lors de la creation de la table %s\n", err)
+	}
+
 	result, err := database.DB.Query("SELECT * FROM funfactlist where id = ? ", id)
 	if err != nil {
 		fmt.Println("Erreur lors de la recuperation des données")
@@ -82,10 +92,16 @@ func GetById(w http.ResponseWriter, r *http.Request) {
 func Post(w http.ResponseWriter, r *http.Request) {
 	database.ConnectDB()
 
+
+	_, err := database.DB.Exec("CREATE TABLE IF NOT EXISTS funfactlist (id INTEGER PRIMARY KEY AUTOINCREMENT, funfact TEXT)")
+	if err != nil {
+		fmt.Printf("Erreur lors de la creation de la table %s\n", err)
+	}
+	
 	var ff model.FunFactPost
 
 	decodeur := json.NewDecoder(r.Body)
-	err := decodeur.Decode(&ff)
+	err = decodeur.Decode(&ff)
 	if err != nil {
 		fmt.Println("Erreur de decodage", err)
 	}
@@ -101,12 +117,17 @@ func Post(w http.ResponseWriter, r *http.Request) {
 
 func Put(w http.ResponseWriter, r *http.Request) {
 	database.ConnectDB()
+
+	_, err := database.DB.Exec("CREATE TABLE IF NOT EXISTS funfactlist (id INTEGER PRIMARY KEY AUTOINCREMENT, funfact TEXT)")
+	if err != nil {
+		fmt.Printf("Erreur lors de la creation de la table %s\n", err)
+	}
 	defer database.DB.Close()
 	id := r.PathValue("id")
 	var ff model.FunFactPost
 
 	decoder := json.NewDecoder(r.Body)
-	err := decoder.Decode(&ff)
+	err = decoder.Decode(&ff)
 	if err != nil {
 		fmt.Println("Erreur lors du decodage du contenu de la requette", err)
 	}
@@ -134,7 +155,11 @@ func Put(w http.ResponseWriter, r *http.Request) {
 func Delete(w http.ResponseWriter, r *http.Request) {
 	database.ConnectDB()
 	defer database.CloseDB()
-	_, err := database.DB.Exec("DELETE FROM funfactlist WHERE id = ?", r.PathValue("id"))
+	_, err := database.DB.Exec("CREATE TABLE IF NOT EXISTS funfactlist (id INTEGER PRIMARY KEY AUTOINCREMENT, funfact TEXT)")
+	if err != nil {
+		fmt.Printf("Erreur lors de la creation de la table %s\n", err)
+	}
+	_, err = database.DB.Exec("DELETE FROM funfactlist WHERE id = ?", r.PathValue("id"))
 
 	if err != nil {
 		fmt.Println("erreur de suppression", err)
