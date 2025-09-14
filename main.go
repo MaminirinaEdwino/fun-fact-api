@@ -15,6 +15,8 @@ func main() {
 	cors := cors.New(cors.Options{
 		AllowedOrigins: []string{"*"},
 		AllowCredentials: true,
+		AllowedHeaders: []string{"*"},
+		AllowedMethods: []string{"*"},
 	})
 	routes.Router(mux)
 	fmt.Println("Server started on localhost:8000")
