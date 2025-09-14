@@ -2,4 +2,7 @@ module github.com/MaminirinaEdwino/fun-fact-api
 
 go 1.24.7
 
-require github.com/mattn/go-sqlite3 v1.14.32 // indirect
+require (
+	github.com/mattn/go-sqlite3 v1.14.32 // indirect
+	github.com/rs/cors v1.11.1 // indirect
+)
